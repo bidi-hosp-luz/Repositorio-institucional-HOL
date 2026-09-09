@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repositorio Digital - Fundación Hospital Nuestra Señora de la Luz, IAP</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f6f9; color: #333; }
+        h1 { color: #004080; font-size: 1.5rem; border-bottom: 2px solid #004080; padding-bottom: 10px; }
+        ul { list-style-type: none; padding: 0; }
+        li { background: #fff; margin-bottom: 10px; padding: 15px; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        a { color: #0056b3; text-decoration: none; font-weight: bold; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <h1>Acervo Documental y Tesis</h1>
+    <p>Selecciona un documento para visualizarlo de forma ligera:</p>
+    
+    <ul id="lista-documentos">
+        <li>Cargando acervo digital...</li>
+    </ul>
+
+    <script>
+        // Configura los datos de tu repositorio automáticamente
+        const usuario = "bidi-hol2026";
+        const repositorio = "repositorio-bidi-fhnsl";
+        const urlAPI = `https://api.github.com/repos/${usuario}/${repositorio}/contents/`;
+
+        fetch(urlAPI)
+            .then(response => response.json())
+            .then(data => {
+                const lista = document.getElementById('lista-documentos');
+                lista.innerHTML = ''; // Limpiar mensaje de carga
+
+                // Filtrar solo los archivos que terminan en .pdf
+                const pdfs = data.filter(archivo => archivo.name.toLowerCase().endsWith('.pdf'));
+
+                if (pdfs.length === 0) {
+                    lista.innerHTML = '<li>No se encontraron archivos PDF en el repositorio.</li>';
+                    return;
+                }
+
+                pdfs.forEach(pdf => {
+                    let li = document.createElement('li');
+                    let enlace = document.createElement('a');
+                    
+                    // Enlazar directamente al visor raw del archivo o descarga
+                    enlace.href = pdf.download_url;
+                    enlace.textContent = pdf.name.replace('.pdf', '');
+                    enlace.target = "_blank"; // Abrir de forma limpia
+
+                    li.appendChild(enlace);
+                    lista.appendChild(li);
+                });
+            })
+            .catch(error => {
+                console.error('Error al cargar los documentos:', error);
+                document.getElementById('lista-documentos').innerHTML = '<li>Error al cargar la lista del acervo.</li>';
+            });
+    </script>
+
+</body>
+</html>
